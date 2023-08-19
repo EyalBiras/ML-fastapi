@@ -29,21 +29,19 @@ transform = transforms.Compose([
 
 dataset = torchvision.datasets.ImageFolder(root=data_dir, transform=transform)
 
-labels = dataset.targets
+labels = {
+    0: "dog",
+    1: "horse",
+    2: "elefent",
+    3: "butterfly",
+    4: "chicken",
+    5: "cat",
+    6: "cow",
+    7: "sheep",
+    8: "spider",
+    9: "squirrl"
+}
 
-n_splits = 1
-split_ratio = 0.8
-
-stratified_splitter = StratifiedShuffleSplit(n_splits=n_splits, test_size=1 - split_ratio)
-
-train_indices, test_indices = next(stratified_splitter.split(dataset, labels))
-
-train_sampler = torch.utils.data.SubsetRandomSampler(train_indices)
-test_sampler = torch.utils.data.SubsetRandomSampler(test_indices)
-
-batch_size = 32
-train_loader = torch.utils.data.DataLoader(dataset, batch_size=batch_size, sampler=train_sampler)
-test_loader = torch.utils.data.DataLoader(dataset, batch_size=batch_size, sampler=test_sampler)
 
 
 def accurecy_calculation(predictions: torch.tensor, real: torch.tensor) -> int:
