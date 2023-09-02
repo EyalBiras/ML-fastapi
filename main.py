@@ -1,6 +1,7 @@
 import os
 import shutil
 import uuid
+from typing import Dict
 
 import uvicorn
 from PIL import Image
@@ -10,10 +11,11 @@ from agent import Agent, transform
 
 app = FastAPI()
 
-agent = Agent("model.pth")
+PATH_TO_MODEL = "model.pth"
+agent = Agent(PATH_TO_MODEL)
 
 
-def preprocess_image(image_file):
+def preprocess_image(image_file: str) -> Image:
     image = Image.open(image_file)
 
     if image.mode == 'RGBA':
@@ -23,8 +25,8 @@ def preprocess_image(image_file):
     return image
 
 
-@app.post('/model/predict')
-def predict_animal(image: UploadFile = File(...)):
+@app.post('/model/predict', status_code=200)
+def predict_animal(image: UploadFile = File(...)) -> Dict[str, str]:
     image.filename = f"{uuid.uuid4()}.jpg"
 
     temp_directory = "temp_images"
@@ -34,16 +36,13 @@ def predict_animal(image: UploadFile = File(...)):
         shutil.copyfileobj(image.file, buffer)
 
     input_image = preprocess_image(image_path)
-    print(input_image.shape)
-
-    print(agent.predict(input_image))
 
     os.remove(image_path)
 
     return {"predicted_class": agent.predict(input_image)}
 
 
-def main():
+def main() -> None:
     uvicorn.run(app)
 
 

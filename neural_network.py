@@ -1,18 +1,24 @@
+from typing import Tuple
+
 import torch
 import torch.nn as nn
 
 
 class MyModel(nn.Module):
-    def __init__(self, input_channels, output_channels, hidden_units):
+    def __init__(self, input_channels: int, output_channels: int, hidden_units: int) -> None:
         super().__init__()
-        self.conv_layer_1 = self._create_conv_layer(kernel_size=3, input_channels=input_channels, output_channels=hidden_units,
-                                                    stride=2, hidden_units=hidden_units, max_pool_kernel=3, padding=1)
-        self.conv_layer_2 = self._create_conv_layer(kernel_size=3, input_channels=hidden_units, output_channels=8,
-                                                    stride=1, hidden_units=hidden_units, max_pool_kernel=2,padding=0)
+        self.conv_layer_1 = self._create_conv_layer(kernel_size=(3, 3), input_channels=input_channels,
+                                                    output_channels=hidden_units,
+                                                    stride=2, hidden_units=hidden_units, max_pool_kernel=(3, 3),
+                                                    padding=1)
+        self.conv_layer_2 = self._create_conv_layer(kernel_size=(3, 3), input_channels=hidden_units, output_channels=8,
+                                                    stride=1, hidden_units=hidden_units, max_pool_kernel=(2, 2),
+                                                    padding=0)
         self.dark_net = self._create_dark_net(output_channels)
 
-    def _create_conv_layer(self, kernel_size, input_channels, output_channels, stride, hidden_units, max_pool_kernel,
-                           padding=0):
+    def _create_conv_layer(self, kernel_size: Tuple[int, int], input_channels: int, output_channels: int, stride: int,
+                           hidden_units: int, max_pool_kernel: Tuple[int, int],
+                           padding: int = 0) -> nn.Sequential:
         return nn.Sequential(
             nn.Conv2d(kernel_size=kernel_size, in_channels=input_channels, out_channels=hidden_units, stride=stride,
                       padding=padding),
@@ -23,7 +29,7 @@ class MyModel(nn.Module):
             nn.MaxPool2d(kernel_size=max_pool_kernel)
         )
 
-    def _create_dark_net(self, output_channels):
+    def _create_dark_net(self, output_channels: int) -> nn.Sequential:
         return nn.Sequential(
             nn.Flatten(),
             nn.Linear(512, 512),
